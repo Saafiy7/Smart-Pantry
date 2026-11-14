@@ -1,0 +1,58 @@
+import 'package:smart_pantry/models/product.dart';
+
+final List<Product> fakeProducts = [
+  Product(
+    name: 'Milk',
+    category: 'Dairy',
+    brand: 'Delice',
+    quantity: 1,
+    unit: 'litre',
+    storageLocation: 'Refrigerator',
+    expirationDate: DateTime.now().add(const Duration(days: 2)),
+  ),
+  Product(
+    name: 'Yogurt',
+    category: 'Dairy',
+    brand: 'Vitalait',
+    quantity: 4,
+    unit: 'pieces',
+    storageLocation: 'Refrigerator',
+    expirationDate: DateTime.now().add(const Duration(days: 1)),
+  ),
+  Product(
+    name: 'Eggs',
+    category: 'Dairy',
+    brand: 'Ferme du Cap',
+    quantity: 12,
+    unit: 'pieces',
+    storageLocation: 'Refrigerator',
+    expirationDate: DateTime.now().add(const Duration(days: 10)),
+  ),
+  Product(
+    name: 'Tomatoes',
+    category: 'Vegetables',
+    brand: 'Local',
+    quantity: 1,
+    unit: 'kg',
+    storageLocation: 'Kitchen',
+    expirationDate: DateTime.now().add(const Duration(days: 4)),
+  ),
+  Product(
+    name: 'Apples',
+    category: 'Fruits',
+    brand: 'Local',
+    quantity: 1.5,
+    unit: 'kg',
+    storageLocation: 'Kitchen',
+    expirationDate: DateTime.now().add(const Duration(days: 8)),
+  ),
+  Product(
+    name: 'Rice',
+    category: 'Other',
+    brand: 'Taieb',
+    quantity: 2,
+    unit: 'kg',
+    storageLocation: 'Pantry',
+    expirationDate: DateTime.now().add(const Duration(days: 180)),
+  ),
+];
