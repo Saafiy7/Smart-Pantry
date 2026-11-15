@@ -2,16 +2,38 @@
 
 A new Flutter project.
 
-## Getting Started
+## Jalon J1 : Squelette
 
-This project is a starting point for a Flutter application.
+Le squelette de l'application est terminé : les 6 écrans existent, la navigation fonctionne et les données passent de la liste au détail. Les données sont fictives pour l'instant (`lib/data/donnees_fictives.dart`).
 
-A few resources to get you started if this is your first Flutter project:
+### Captures d'écran
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+| Home | My Products | Product Details |
+|---|---|---|
+| <img src="docs/images/home.png" width="200"> | <img src="docs/images/my_products.png" width="200"> | <img src="docs/images/product_details.png" width="200"> | <img src="docs/images/product_details2.png" width="200">
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+| Add Product | Shopping List | Profile & Settings |
+|---|---|---|
+| <img src="docs/images/add_product.png" width="200"> | <img src="docs/images/shopping.png" width="200"> | <img src="docs/images/profile.png" width="200"> |
+
+### Navigation
+
+- Barre de navigation : Home ↔ My Products ↔ Shopping List ↔ Profile & Settings
+- Home → Product Details (produit touché dans « Expiring Soon »)
+- My Products → Product Details (produit touché dans la liste)
+- Home → Add Product (bouton « Add Product »)
+- Shopping List → Check (Product bought) → edit product name → delete product
+
+Le produit touché est transmis à l'écran de détail par le constructeur : `ProductDetailsScreen(product: product)`.
+
+### Répartition du travail
+
+| Membre | Travail réalisé |
+|---|---|
+| Ahmed Wardi | Modèle `Product`, widgets `ProductCard` et `SectionTitle`, écrans Home, My Products et Product Details, données fictives |
+| Youssef Saafi | Thème (`app_colors.dart`, `app_theme.dart`), modèle `ShoppingItem`, widgets `CustomButton` et `CustomTextField`, écrans Add Product, Shopping List et Profile, navigation |
+
+### Exigences couvertes
+
+- **EF1** : 6 écrans, dont une liste (My Products) et un détail (Product Details)
+- **EF2** : navigation avec passage de données (liste → détail)
