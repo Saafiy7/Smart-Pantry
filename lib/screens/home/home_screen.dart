@@ -4,16 +4,26 @@ import 'package:smart_pantry/data/donnees_fictives.dart';
 import 'package:smart_pantry/models/product.dart';
 import 'package:smart_pantry/screens/product_details/product_details_screen.dart';
 import 'package:smart_pantry/widgets/product_card.dart';
+import 'package:smart_pantry/screens/add_product/add_product_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final VoidCallback onSeeAllProducts;
+  final VoidCallback onOpenShoppingList;
 
-  static const int _shoppingItemsCount = 5;
+  const HomeScreen({
+    super.key,
+    required this.onSeeAllProducts,
+    required this.onOpenShoppingList,
+  });
 
   int _daysLeft(Product product) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    return product.expirationDate.difference(today).inDays;
+    final today = DateTime.now();
+    final expirationDate = product.expirationDate;
+    return DateTime(
+      expirationDate.year,
+      expirationDate.month,
+      expirationDate.day,
+    ).difference(DateTime(today.year, today.month, today.day)).inDays;
   }
 
   Widget _statCard(
@@ -46,8 +56,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final expiringProducts =
-        fakeProducts.where((product) => _daysLeft(product) <= 3).toList();
+    final expiringProducts = fakeProducts
+        .where((product) => _daysLeft(product) <= 3)
+        .toList();
 
     return Scaffold(
       body: SafeArea(
@@ -58,7 +69,10 @@ class HomeScreen extends StatelessWidget {
             children: [
               Text('Hello, Youssef!', style: textTheme.headlineSmall),
               const SizedBox(height: 4),
-              Text("Let's manage your pantry today.", style: textTheme.bodySmall),
+              Text(
+                "Let's manage your pantry today.",
+                style: textTheme.bodySmall,
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -79,7 +93,7 @@ class HomeScreen extends StatelessWidget {
                   _statCard(
                     context,
                     icon: Icons.shopping_cart_outlined,
-                    value: '$_shoppingItemsCount',
+                    value: '0',
                     label: 'Shopping Items',
                     color: AppColors.white,
                   ),
@@ -90,7 +104,10 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Expiring Soon', style: textTheme.titleMedium),
-                  TextButton(onPressed: () {}, child: const Text('See all')),
+                  TextButton(
+                    onPressed: onSeeAllProducts,
+                    child: const Text('See all'),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -115,7 +132,14 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: FilledButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AddProductScreen(),
+                          ),
+                        );
+                      },
                       icon: const Icon(Icons.add),
                       label: const Text('Add Product'),
                     ),
@@ -123,7 +147,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () {},
+                      onPressed: onOpenShoppingList,
                       icon: const Icon(Icons.list),
                       label: const Text('Shopping List'),
                       style: OutlinedButton.styleFrom(

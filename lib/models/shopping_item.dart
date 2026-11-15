@@ -11,9 +11,8 @@ class ShoppingItem {
     this.isBought = false,
   });
 
-  ShoppingItem.fromName(String name)
+  ShoppingItem.fromName(this.name)
     : id = DateTime.now().microsecondsSinceEpoch.toString(),
-      name = name,
       quantity = 1,
       isBought = false;
 
