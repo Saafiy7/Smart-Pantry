@@ -5,6 +5,7 @@ import 'package:smart_pantry/models/product.dart';
 import 'package:smart_pantry/screens/product_details/product_details_screen.dart';
 import 'package:smart_pantry/widgets/product_card.dart';
 import 'package:smart_pantry/screens/add_product/add_product_screen.dart';
+import 'package:smart_pantry/widgets/section_title.dart';
 
 class HomeScreen extends StatelessWidget {
   final VoidCallback onSeeAllProducts;
@@ -100,15 +101,10 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Expiring Soon', style: textTheme.titleMedium),
-                  TextButton(
-                    onPressed: onSeeAllProducts,
-                    child: const Text('See all'),
-                  ),
-                ],
+              SectionTitle(
+                title: 'Expiring Soon',
+                actionLabel: 'See all',
+                onAction: () {},
               ),
               const SizedBox(height: 8),
               for (final product in expiringProducts)
