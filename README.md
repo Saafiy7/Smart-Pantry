@@ -37,3 +37,9 @@ Le produit touché est transmis à l'écran de détail par le constructeur : `Pr
 
 - **EF1** : 6 écrans, dont une liste (My Products) et un détail (Product Details)
 - **EF2** : navigation avec passage de données (liste → détail)
+
+### Journale IA
+
+- Journale Ahmed : https://share.gemini.google/brFqHRHfdxgc
+- Journale Youssef : https://chatgpt.com/share/6afb6358-7b9c-83ea-9163-b2de919a9e98?ogimg=plain
+
