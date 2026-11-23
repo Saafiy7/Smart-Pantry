@@ -5,6 +5,7 @@ import 'package:smart_pantry/widgets/product_card.dart';
 import 'package:smart_pantry/screens/product_details/product_details_screen.dart';
 import 'package:smart_pantry/screens/add_product/add_product_screen.dart';
 import 'package:smart_pantry/models/product.dart';
+import 'package:smart_pantry/services/preferences_service.dart';
 
 class MyProductsScreen extends StatefulWidget {
   const MyProductsScreen({super.key});
@@ -60,6 +61,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                       child: ProductCard(
                         product: product,
                         onTap: () {
+                          PreferencesService.saveLastViewed(product.name);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
