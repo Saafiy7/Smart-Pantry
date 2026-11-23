@@ -15,7 +15,6 @@ class OpenFoodFactsSearchScreen extends StatefulWidget {
 
 class _OpenFoodFactsSearchScreenState extends State<OpenFoodFactsSearchScreen> {
   final _queryController = TextEditingController();
-  final _service = OpenFoodFactsService();
   Future<List<FoodInfo>>? _searchFuture;
 
   @override
