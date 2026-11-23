@@ -8,6 +8,7 @@ import 'package:smart_pantry/widgets/product_card.dart';
 import 'package:smart_pantry/screens/add_product/add_product_screen.dart';
 import 'package:smart_pantry/widgets/section_title.dart';
 import 'package:smart_pantry/providers/shopping_provider.dart';
+import 'package:smart_pantry/services/preferences_service.dart';
 
 class HomeScreen extends StatelessWidget {
   final VoidCallback onSeeAllProducts;
@@ -78,6 +79,17 @@ class HomeScreen extends StatelessWidget {
                 "Let's manage your pantry today.",
                 style: textTheme.bodySmall,
               ),
+              FutureBuilder<String?>(
+                future: PreferencesService.getLastViewed(),
+                builder: (context, snapshot) {
+                  final name = snapshot.data;
+                  if (name == null) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text('Last viewed: $name', style: textTheme.bodySmall),
+                  );
+                },
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -117,6 +129,7 @@ class HomeScreen extends StatelessWidget {
                   child: ProductCard(
                     product: product,
                     onTap: () {
+                      PreferencesService.saveLastViewed(product.name);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
