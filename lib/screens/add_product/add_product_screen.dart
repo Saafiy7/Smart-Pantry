@@ -35,6 +35,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   String _selectedUnit = 'pcs';
   String _selectedLocation = 'Fridge';
   DateTime? _selectedDate;
+  String? _imageUrl;
 
   @override
   void dispose() {
@@ -155,7 +156,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   label: 'Search with Open Food Facts',
                   icon: Icons.search,
                   isSecondary: true,
-                  onPressed: () {}, // connected in Y4
+                  onPressed:  _searchOpenFoodFacts,
                 ),
                 if (_imageUrl != null) ...[
                   const SizedBox(height: 16),
