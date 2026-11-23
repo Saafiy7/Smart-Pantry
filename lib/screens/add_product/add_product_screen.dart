@@ -3,6 +3,8 @@ import '../../models/product.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
+import '../../models/food_info.dart';
+import 'open_food_facts_search_screen.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
@@ -96,6 +98,23 @@ class _AddProductScreenState extends State<AddProductScreen> {
     return null;
   }
 
+  Future<void> _searchOpenFoodFacts() async {
+    final result = await Navigator.push<FoodInfo>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const OpenFoodFactsSearchScreen(),
+      ),
+    );
+
+    if (result == null || !mounted) return;
+
+    setState(() {
+      _nameController.text = result.name;
+      _brandController.text = result.brand;
+      _imageUrl = result.imageUrl;
+    });
+  }
+
   void _saveProduct() {
     if (!_formKey.currentState!.validate()) return;
 
@@ -138,6 +157,23 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   isSecondary: true,
                   onPressed: () {}, // connected in Y4
                 ),
+                if (_imageUrl != null) ...[
+                  const SizedBox(height: 16),
+                  Center(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        _imageUrl!,
+                        height: 120,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                              Icons.image_not_supported_outlined,
+                              size: 48,
+                            ),
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 24),
                 Text('Product information', style: textTheme.titleMedium),
                 const SizedBox(height: 16),
