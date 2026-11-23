@@ -7,6 +7,7 @@ import 'package:smart_pantry/screens/product_details/product_details_screen.dart
 import 'package:smart_pantry/widgets/product_card.dart';
 import 'package:smart_pantry/screens/add_product/add_product_screen.dart';
 import 'package:smart_pantry/widgets/section_title.dart';
+import 'package:smart_pantry/providers/shopping_provider.dart';
 
 class HomeScreen extends StatelessWidget {
   final VoidCallback onSeeAllProducts;
@@ -58,6 +59,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final shoppingCount = context.watch<ShoppingProvider>().toBuyCount;
     final products = context.watch<InventoryProvider>().products;
     final expiringProducts = products
         .where((product) => _daysLeft(product) <= 3)
@@ -96,7 +98,7 @@ class HomeScreen extends StatelessWidget {
                   _statCard(
                     context,
                     icon: Icons.shopping_cart_outlined,
-                    value: '0',
+                    value: '$shoppingCount',
                     label: 'Shopping Items',
                     color: AppColors.white,
                   ),
