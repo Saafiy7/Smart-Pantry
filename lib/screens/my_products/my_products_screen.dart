@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smart_pantry/data/donnees_fictives.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_pantry/providers/inventory_provider.dart';
 import 'package:smart_pantry/widgets/product_card.dart';
 import 'package:smart_pantry/screens/product_details/product_details_screen.dart';
 import 'package:smart_pantry/screens/add_product/add_product_screen.dart';
@@ -16,6 +17,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final products = context.watch<InventoryProvider>().products;
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
@@ -28,7 +30,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
           if (newProduct == null || !context.mounted) return;
 
           setState(() {
-            fakeProducts.add(newProduct);
+            products.add(newProduct);
           });
 
           ScaffoldMessenger.of(context).showSnackBar(
@@ -50,9 +52,9 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
               const SizedBox(height: 16),
               Expanded(
                 child: ListView.builder(
-                  itemCount: fakeProducts.length,
+                  itemCount: products.length,
                   itemBuilder: (context, index) {
-                    final product = fakeProducts[index];
+                    final product = products[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: ProductCard(
