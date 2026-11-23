@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_pantry/core/theme/app_colors.dart';
-import 'package:smart_pantry/data/donnees_fictives.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_pantry/providers/inventory_provider.dart';
 import 'package:smart_pantry/models/product.dart';
 import 'package:smart_pantry/screens/product_details/product_details_screen.dart';
 import 'package:smart_pantry/widgets/product_card.dart';
@@ -57,7 +58,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final expiringProducts = fakeProducts
+    final products = context.watch<InventoryProvider>().products;
+    final expiringProducts = products
         .where((product) => _daysLeft(product) <= 3)
         .toList();
 
@@ -80,7 +82,7 @@ class HomeScreen extends StatelessWidget {
                   _statCard(
                     context,
                     icon: Icons.inventory_2_outlined,
-                    value: '${fakeProducts.length}',
+                    value: '${products.length}',
                     label: 'Total Products',
                     color: AppColors.white,
                   ),
