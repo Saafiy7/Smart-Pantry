@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
+import 'providers/shopping_provider.dart';
 import 'screens/main_screen.dart';
 
 void main() {
-  runApp(const SmartPantryApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => ShoppingProvider())],
+      child: const SmartPantryApp(),
+    ),
+  );
 }
 
 class SmartPantryApp extends StatelessWidget {
