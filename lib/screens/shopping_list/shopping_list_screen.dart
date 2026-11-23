@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/shopping_item.dart';
+import '../../providers/shopping_provider.dart';
 
 class ShoppingListScreen extends StatefulWidget {
   const ShoppingListScreen({super.key});
@@ -10,14 +12,6 @@ class ShoppingListScreen extends StatefulWidget {
 }
 
 class _ShoppingListScreenState extends State<ShoppingListScreen> {
-  // Temporary fake data (replaced by a Provider in J2)
-  final List<ShoppingItem> _items = [
-    ShoppingItem(id: '1', name: 'Milk', quantity: 2),
-    ShoppingItem(id: '2', name: 'Eggs', quantity: 12),
-    ShoppingItem(id: '3', name: 'Tomatoes', isBought: true),
-    ShoppingItem.fromName('Olive oil'),
-  ];
-
   final _itemController = TextEditingController();
 
   @override
@@ -58,19 +52,12 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
 
     if (result == null || result.isEmpty || !mounted) return;
 
-    setState(() {
-      if (item == null) {
-        _items.add(ShoppingItem.fromName(result));
-      } else {
-        final index = _items.indexOf(item);
-        _items[index] = ShoppingItem(
-          id: item.id,
-          name: result,
-          quantity: item.quantity,
-          isBought: item.isBought,
-        );
-      }
-    });
+    final shopping = context.read<ShoppingProvider>();
+    if (item == null) {
+      shopping.addItem(result);
+    } else {
+      shopping.updateItemName(item, result);
+    }
   }
 
   Widget _buildItem(ShoppingItem item) {
@@ -81,9 +68,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
         value: item.isBought,
         controlAffinity: ListTileControlAffinity.leading,
         onChanged: (value) {
-          setState(() {
-            item.isBought = value ?? false;
-          });
+          context.read<ShoppingProvider>().toggleBought(item, value ?? false);
         },
         title: Text(
           item.name,
@@ -105,9 +90,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
             IconButton(
               icon: const Icon(Icons.delete_outline),
               onPressed: () {
-                setState(() {
-                  _items.remove(item);
-                });
+                context.read<ShoppingProvider>().removeItem(item);
               },
             ),
           ],
@@ -120,9 +103,10 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
+    final shopping = context.watch<ShoppingProvider>();
 
-    final toBuy = _items.where((item) => !item.isBought).toList();
-    final bought = _items.where((item) => item.isBought).toList();
+    final toBuy = shopping.toBuyItems;
+    final bought = shopping.boughtItems;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Shopping list')),
@@ -134,7 +118,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
         label: const Text('Add item'),
       ),
       body: SafeArea(
-        child: _items.isEmpty
+        child: shopping.items.isEmpty
             ? Center(
                 child: Text('Your list is empty', style: textTheme.bodySmall),
               )
