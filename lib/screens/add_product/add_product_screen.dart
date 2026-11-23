@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../../models/product.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
@@ -103,14 +103,18 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _quantityController.text.trim().replaceAll(',', '.'),
     );
 
-    // Temporary: the product will be returned to the previous screen in Y2
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Valid: ${_nameController.text.trim()} - $quantity $_selectedUnit',
-        ),
-      ),
+    final product = Product(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      name: _nameController.text.trim(),
+      category: _selectedCategory,
+      brand: _brandController.text.trim(),
+      quantity: quantity,
+      unit: _selectedUnit,
+      storageLocation: _selectedLocation,
+      expirationDate: _selectedDate!,
     );
+
+    Navigator.pop(context, product);
   }
 
   @override
