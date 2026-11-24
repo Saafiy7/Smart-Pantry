@@ -27,16 +27,9 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
             context,
             MaterialPageRoute(builder: (context) => const AddProductScreen()),
           );
-
-          if (newProduct == null || !context.mounted) return;
-
-          setState(() {
-            products.add(newProduct);
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Received: ${newProduct.name}')),
-          );
+          if (newProduct != null && context.mounted) {
+            context.read<InventoryProvider>().addProduct(newProduct);
+          }
         },
         icon: const Icon(Icons.add),
         label: const Text('Add Product'),

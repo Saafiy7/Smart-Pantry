@@ -148,18 +148,11 @@ class HomeScreen extends StatelessWidget {
                       onPressed: () async {
                         final newProduct = await Navigator.push<Product>(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const AddProductScreen(),
-                          ),
+                          MaterialPageRoute(builder: (context) => const AddProductScreen()),
                         );
-
-                        if (newProduct == null || !context.mounted) return;
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Received: ${newProduct.name}'),
-                          ),
-                        );
+                        if (newProduct != null && context.mounted) {
+                          context.read<InventoryProvider>().addProduct(newProduct);
+                        }
                       },
                       icon: const Icon(Icons.add),
                       label: const Text('Add Product'),
