@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_pantry/core/theme/app_colors.dart';
 import 'package:smart_pantry/models/product.dart';
+import 'package:smart_pantry/providers/inventory_provider.dart';
 import 'package:smart_pantry/screens/edit_product/edit_product_screen.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
