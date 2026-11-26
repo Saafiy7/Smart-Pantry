@@ -2,6 +2,7 @@ import 'package:smart_pantry/models/product.dart';
 
 final List<Product> fakeProducts = [
   Product(
+    id: '1',
     name: 'Milk',
     category: 'Dairy',
     brand: 'Delice',
@@ -11,6 +12,7 @@ final List<Product> fakeProducts = [
     expirationDate: DateTime.now().add(const Duration(days: 2)),
   ),
   Product(
+    id: '2',
     name: 'Yogurt',
     category: 'Dairy',
     brand: 'Vitalait',
@@ -20,6 +22,7 @@ final List<Product> fakeProducts = [
     expirationDate: DateTime.now().add(const Duration(days: 1)),
   ),
   Product(
+    id: '3',
     name: 'Eggs',
     category: 'Dairy',
     brand: 'Ferme du Cap',
@@ -29,6 +32,7 @@ final List<Product> fakeProducts = [
     expirationDate: DateTime.now().add(const Duration(days: 10)),
   ),
   Product(
+    id: '4',
     name: 'Tomatoes',
     category: 'Vegetables',
     brand: 'Local',
@@ -38,6 +42,7 @@ final List<Product> fakeProducts = [
     expirationDate: DateTime.now().add(const Duration(days: 4)),
   ),
   Product(
+    id: '5',
     name: 'Apples',
     category: 'Fruits',
     brand: 'Local',
@@ -47,6 +52,7 @@ final List<Product> fakeProducts = [
     expirationDate: DateTime.now().add(const Duration(days: 8)),
   ),
   Product(
+    id: '6',
     name: 'Rice',
     category: 'Other',
     brand: 'Taieb',

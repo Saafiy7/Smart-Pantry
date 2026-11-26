@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:smart_pantry/core/theme/app_colors.dart';
-import 'package:smart_pantry/data/donnees_fictives.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_pantry/providers/inventory_provider.dart';
 import 'package:smart_pantry/models/product.dart';
 import 'package:smart_pantry/screens/product_details/product_details_screen.dart';
 import 'package:smart_pantry/widgets/product_card.dart';
+import 'package:smart_pantry/screens/add_product/add_product_screen.dart';
+import 'package:smart_pantry/widgets/section_title.dart';
+import 'package:smart_pantry/providers/shopping_provider.dart';
+import 'package:smart_pantry/services/preferences_service.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final VoidCallback onSeeAllProducts;
+  final VoidCallback onOpenShoppingList;
 
-  static const int _shoppingItemsCount = 5;
+  const HomeScreen({
+    super.key,
+    required this.onSeeAllProducts,
+    required this.onOpenShoppingList,
+  });
 
   int _daysLeft(Product product) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    return product.expirationDate.difference(today).inDays;
+    final today = DateTime.now();
+    final expirationDate = product.expirationDate;
+    return DateTime(
+      expirationDate.year,
+      expirationDate.month,
+      expirationDate.day,
+    ).difference(DateTime(today.year, today.month, today.day)).inDays;
   }
 
   Widget _statCard(
@@ -46,8 +60,11 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final expiringProducts =
-        fakeProducts.where((product) => _daysLeft(product) <= 3).toList();
+    final shoppingCount = context.watch<ShoppingProvider>().toBuyCount;
+    final products = context.watch<InventoryProvider>().products;
+    final expiringProducts = products
+        .where((product) => _daysLeft(product) <= 3)
+        .toList();
 
     return Scaffold(
       body: SafeArea(
@@ -58,14 +75,28 @@ class HomeScreen extends StatelessWidget {
             children: [
               Text('Hello, Youssef!', style: textTheme.headlineSmall),
               const SizedBox(height: 4),
-              Text("Let's manage your pantry today.", style: textTheme.bodySmall),
+              Text(
+                "Let's manage your pantry today.",
+                style: textTheme.bodySmall,
+              ),
+              FutureBuilder<String?>(
+                future: PreferencesService.getLastViewed(),
+                builder: (context, snapshot) {
+                  final name = snapshot.data;
+                  if (name == null) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text('Last viewed: $name', style: textTheme.bodySmall),
+                  );
+                },
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
                   _statCard(
                     context,
                     icon: Icons.inventory_2_outlined,
-                    value: '${fakeProducts.length}',
+                    value: '${products.length}',
                     label: 'Total Products',
                     color: AppColors.white,
                   ),
@@ -79,19 +110,17 @@ class HomeScreen extends StatelessWidget {
                   _statCard(
                     context,
                     icon: Icons.shopping_cart_outlined,
-                    value: '$_shoppingItemsCount',
+                    value: '$shoppingCount',
                     label: 'Shopping Items',
                     color: AppColors.white,
                   ),
                 ],
               ),
               const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Expiring Soon', style: textTheme.titleMedium),
-                  TextButton(onPressed: () {}, child: const Text('See all')),
-                ],
+              SectionTitle(
+                title: 'Expiring Soon',
+                actionLabel: 'See all',
+                onAction: () {},
               ),
               const SizedBox(height: 8),
               for (final product in expiringProducts)
@@ -100,6 +129,7 @@ class HomeScreen extends StatelessWidget {
                   child: ProductCard(
                     product: product,
                     onTap: () {
+                      PreferencesService.saveLastViewed(product.name);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -115,7 +145,15 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: FilledButton.icon(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final newProduct = await Navigator.push<Product>(
+                          context,
+                          MaterialPageRoute(builder: (context) => const AddProductScreen()),
+                        );
+                        if (newProduct != null && context.mounted) {
+                          context.read<InventoryProvider>().addProduct(newProduct);
+                        }
+                      },
                       icon: const Icon(Icons.add),
                       label: const Text('Add Product'),
                     ),
@@ -123,7 +161,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () {},
+                      onPressed: onOpenShoppingList,
                       icon: const Icon(Icons.list),
                       label: const Text('Shopping List'),
                       style: OutlinedButton.styleFrom(

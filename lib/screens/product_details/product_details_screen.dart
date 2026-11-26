@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_pantry/core/theme/app_colors.dart';
 import 'package:smart_pantry/models/product.dart';
 import 'package:smart_pantry/screens/edit_product/edit_product_screen.dart';
@@ -13,28 +14,28 @@ class ProductDetailsScreen extends StatelessWidget {
     'July', 'August', 'September', 'October', 'November', 'December',
   ];
 
-  String get _formattedDate {
-    final d = product.expirationDate;
+  String _formattedDate(Product p) {
+    final d = p.expirationDate;
     return '${d.day.toString().padLeft(2, '0')} ${_months[d.month - 1]} ${d.year}';
   }
 
-  int get _daysLeft {
+  int _daysLeft(Product p) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    return product.expirationDate.difference(today).inDays;
+    return p.expirationDate.difference(today).inDays;
   }
 
-  String get _expiryText {
-    if (_daysLeft < 0) return 'Expired';
-    if (_daysLeft == 0) return 'Expires today';
-    return 'Expires in $_daysLeft days';
+  String _expiryText(Product p) {
+    final days = _daysLeft(p);
+    if (days < 0) return 'Expired';
+    if (days == 0) return 'Expires today';
+    return 'Expires in $days days';
   }
 
-  String get _quantityText {
-    final qty = product.quantity % 1 == 0
-        ? product.quantity.toInt().toString()
-        : product.quantity.toString();
-    return '$qty ${product.unit}';
+  String _quantityNumber(Product p) {
+    return p.quantity % 1 == 0
+        ? p.quantity.toInt().toString()
+        : p.quantity.toString();
   }
 
   Widget _infoRow(BuildContext context, String label, String value) {
@@ -51,9 +52,41 @@ class ProductDetailsScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _confirmDelete(BuildContext context, Product live) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete product'),
+        content: Text('Delete ${live.name} from your pantry?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: AppColors.dangerRed),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      final inventory = context.read<InventoryProvider>();
+      Navigator.pop(context);
+      inventory.deleteProduct(live.id);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final inventory = context.watch<InventoryProvider>();
+    final matches = inventory.products.where((p) => p.id == product.id).toList();
+    if (matches.isEmpty) return const Scaffold();
+    final live = matches.first;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Product Details')),
@@ -83,7 +116,7 @@ class ProductDetailsScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(product.name, style: textTheme.titleMedium),
+                        Text(live.name, style: textTheme.titleMedium),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
@@ -94,7 +127,7 @@ class ProductDetailsScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            product.category,
+                            live.category,
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -105,10 +138,14 @@ class ProductDetailsScreen extends StatelessWidget {
                       ],
                     ),
                     const Divider(),
-                    _infoRow(context, 'Category', product.category),
-                    _infoRow(context, 'Brand', product.brand),
-                    _infoRow(context, 'Quantity', _quantityText),
-                    _infoRow(context, 'Storage location', product.storageLocation),
+                    _infoRow(context, 'Category', live.category),
+                    _infoRow(context, 'Brand', live.brand),
+                    _infoRow(
+                      context,
+                      'Quantity',
+                      '${_quantityNumber(live)} ${live.unit}',
+                    ),
+                    _infoRow(context, 'Storage location', live.storageLocation),
                   ],
                 ),
               ),
@@ -126,10 +163,43 @@ class ProductDetailsScreen extends StatelessWidget {
                 children: [
                   Text('Expiration Date', style: textTheme.bodySmall),
                   const SizedBox(height: 4),
-                  Text(_formattedDate, style: textTheme.titleMedium),
+                  Text(_formattedDate(live), style: textTheme.titleMedium),
                   const SizedBox(height: 4),
-                  Text(_expiryText, style: textTheme.bodySmall),
+                  Text(_expiryText(live), style: textTheme.bodySmall),
                 ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Quantity in stock', style: textTheme.bodyMedium),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: live.quantity > 1
+                              ? () => inventory.updateProduct(
+                                    live.copyWith(quantity: live.quantity - 1),
+                                  )
+                              : null,
+                          icon: const Icon(Icons.remove_circle_outline),
+                          color: AppColors.primaryGreen,
+                        ),
+                        Text(_quantityNumber(live), style: textTheme.titleMedium),
+                        IconButton(
+                          onPressed: () => inventory.updateProduct(
+                            live.copyWith(quantity: live.quantity + 1),
+                          ),
+                          icon: const Icon(Icons.add_circle_outline),
+                          color: AppColors.primaryGreen,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -150,7 +220,7 @@ class ProductDetailsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
-              onPressed: () {},
+              onPressed: () => _confirmDelete(context, live),
               icon: const Icon(Icons.delete_outline),
               label: const Text('Delete Product'),
               style: OutlinedButton.styleFrom(
