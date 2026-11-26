@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_pantry/core/theme/app_colors.dart';
 import 'package:smart_pantry/models/product.dart';
+import 'package:smart_pantry/screens/edit_product/edit_product_screen.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   final Product product;
@@ -133,7 +134,17 @@ class ProductDetailsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () {},
+              onPressed: () async {
+                final updated = await Navigator.push<Product>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProductScreen(product: live),
+                  ),
+                );
+                if (updated != null && context.mounted) {
+                  inventory.updateProduct(updated);
+                }
+              },
               icon: const Icon(Icons.edit_outlined),
               label: const Text('Edit Product'),
             ),
