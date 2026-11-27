@@ -7,7 +7,8 @@ import '../../models/food_info.dart';
 import 'open_food_facts_search_screen.dart';
 
 class AddProductScreen extends StatefulWidget {
-  const AddProductScreen({super.key});
+  final Product? product;
+  const AddProductScreen({super.key, this.product});
 
   @override
   State<AddProductScreen> createState() => _AddProductScreenState();
@@ -36,6 +37,37 @@ class _AddProductScreenState extends State<AddProductScreen> {
   String _selectedLocation = 'Fridge';
   DateTime? _selectedDate;
   String? _imageUrl;
+  bool get _isEditing => widget.product != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final product = widget.product;
+    if (product == null) return;
+
+    _nameController.text = product.name;
+    _brandController.text = product.brand;
+    _quantityController.text = product.quantity % 1 == 0
+        ? product.quantity.toInt().toString()
+        : product.quantity.toString();
+    _selectedDate = product.expirationDate;
+    _dateController.text = _formatDate(product.expirationDate);
+    _selectedCategory = product.category;
+    _selectedUnit = product.unit;
+    _selectedLocation = product.storageLocation;
+    _imageUrl = product.imageUrl;
+
+    if (!_categories.contains(_selectedCategory)) {
+      _categories.add(_selectedCategory);
+    }
+    if (!_units.contains(_selectedUnit)) {
+      _units.add(_selectedUnit);
+    }
+    if (!_locations.contains(_selectedLocation)) {
+      _locations.add(_selectedLocation);
+    }
+  }
 
   @override
   void dispose() {
@@ -123,18 +155,32 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _quantityController.text.trim().replaceAll(',', '.'),
     );
 
-    final product = Product(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
-      name: _nameController.text.trim(),
-      category: _selectedCategory,
-      brand: _brandController.text.trim(),
-      quantity: quantity,
-      unit: _selectedUnit,
-      storageLocation: _selectedLocation,
-      expirationDate: _selectedDate!,
-    );
-
-    Navigator.pop(context, product);
+    final Product result;
+    if (_isEditing) {
+      result = widget.product!.copyWith(
+        name: _nameController.text.trim(),
+        category: _selectedCategory,
+        brand: _brandController.text.trim(),
+        quantity: quantity,
+        unit: _selectedUnit,
+        storageLocation: _selectedLocation,
+        expirationDate: _selectedDate,
+        imageUrl: _imageUrl,
+      );
+    } else {
+      result = Product(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        name: _nameController.text.trim(),
+        category: _selectedCategory,
+        brand: _brandController.text.trim(),
+        quantity: quantity,
+        unit: _selectedUnit,
+        storageLocation: _selectedLocation,
+        expirationDate: _selectedDate!,
+        imageUrl: _imageUrl,
+      );
+    }
+    Navigator.pop(context, result);
   }
 
   @override
@@ -142,7 +188,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Add product')),
+      appBar: AppBar(title: Text(_isEditing ? 'Edit product' : 'Add product')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -152,12 +198,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomButton(
-                  label: 'Search with Open Food Facts',
-                  icon: Icons.search,
-                  isSecondary: true,
-                  onPressed:  _searchOpenFoodFacts,
-                ),
+                if (!_isEditing) ...[
+                  CustomButton(
+                    label: 'Search with Open Food Facts',
+                    icon: Icons.search,
+                    isSecondary: true,
+                    onPressed: _searchOpenFoodFacts,
+                  ),
+                  const SizedBox(height: 24),
+                ],
                 if (_imageUrl != null) ...[
                   const SizedBox(height: 16),
                   Center(
@@ -265,7 +314,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-                CustomButton(label: 'Save product', onPressed: _saveProduct),
+                CustomButton(
+                  label: _isEditing ? 'Save changes' : 'Save product',
+                  onPressed: _saveProduct,
+                ),
               ],
             ),
           ),
