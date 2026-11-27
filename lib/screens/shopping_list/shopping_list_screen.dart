@@ -118,7 +118,9 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
         label: const Text('Add item'),
       ),
       body: SafeArea(
-        child: shopping.items.isEmpty
+        child: !shopping.isLoaded
+            ? const Center(child: CircularProgressIndicator())
+            : shopping.items.isEmpty
             ? Center(
                 child: Text('Your list is empty', style: textTheme.bodySmall),
               )
