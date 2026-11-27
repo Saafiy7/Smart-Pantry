@@ -16,6 +16,18 @@ class ShoppingItem {
       quantity = 1,
       isBought = false;
 
+  factory ShoppingItem.fromJson(Map<String, dynamic> json) {
+    return ShoppingItem(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      quantity: (json['quantity'] as int?) ?? 1,
+      isBought: (json['isBought'] as bool?) ?? false,
+    );
+  }
+   Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name, 'quantity': quantity, 'isBought': isBought};
+  }
+
   @override
   String toString() {
     return 'ShoppingItem($name, x$quantity, bought: $isBought)';
