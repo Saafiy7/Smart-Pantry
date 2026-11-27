@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../models/shopping_item.dart';
 import '../../providers/shopping_provider.dart';
 
+enum ShoppingFilter { all, toBuy, bought }
+
 class ShoppingListScreen extends StatefulWidget {
   const ShoppingListScreen({super.key});
 
@@ -13,6 +15,7 @@ class ShoppingListScreen extends StatefulWidget {
 
 class _ShoppingListScreenState extends State<ShoppingListScreen> {
   final _itemController = TextEditingController();
+  ShoppingFilter _filter = ShoppingFilter.all;
 
   @override
   void dispose() {
@@ -108,6 +111,82 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
     final toBuy = shopping.toBuyItems;
     final bought = shopping.boughtItems;
 
+    final showToBuy = _filter != ShoppingFilter.bought;
+    final showBought = _filter != ShoppingFilter.toBuy;
+    final visibleCount =
+        (showToBuy ? toBuy.length : 0) + (showBought ? bought.length : 0);
+
+    Widget content;
+    if (!shopping.isLoaded) {
+      content = const Center(child: CircularProgressIndicator());
+    } else if (shopping.items.isEmpty) {
+      content = Center(
+        child: Text('Your list is empty', style: textTheme.bodySmall),
+      );
+    } else {
+      content = Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<ShoppingFilter>(
+                showSelectedIcon: false,
+                segments: const [
+                  ButtonSegment(value: ShoppingFilter.all, label: Text('All')),
+                  ButtonSegment(
+                    value: ShoppingFilter.toBuy,
+                    label: Text('To buy'),
+                  ),
+                  ButtonSegment(
+                    value: ShoppingFilter.bought,
+                    label: Text('Bought'),
+                  ),
+                ],
+                selected: {_filter},
+                onSelectionChanged: (selection) {
+                  setState(() {
+                    _filter = selection.first;
+                  });
+                },
+              ),
+            ),
+          ),
+          Expanded(
+            child: visibleCount == 0
+                ? Center(
+                    child: Text(
+                      'No items in this filter',
+                      style: textTheme.bodySmall,
+                    ),
+                  )
+                : ListView(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 90),
+                    children: [
+                      if (showToBuy) ...[
+                        Text(
+                          'To buy (${toBuy.length})',
+                          style: textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        ...toBuy.map(_buildItem),
+                      ],
+                      if (showToBuy && showBought) const SizedBox(height: 24),
+                      if (showBought) ...[
+                        Text(
+                          'Bought (${bought.length})',
+                          style: textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        ...bought.map(_buildItem),
+                      ],
+                    ],
+                  ),
+          ),
+        ],
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Shopping list')),
       floatingActionButton: FloatingActionButton.extended(
@@ -117,32 +196,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
         icon: const Icon(Icons.add),
         label: const Text('Add item'),
       ),
-      body: SafeArea(
-        child: !shopping.isLoaded
-            ? const Center(child: CircularProgressIndicator())
-            : shopping.items.isEmpty
-            ? Center(
-                child: Text('Your list is empty', style: textTheme.bodySmall),
-              )
-            : ListView(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 90),
-                children: [
-                  Text(
-                    'To buy (${toBuy.length})',
-                    style: textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  ...toBuy.map(_buildItem),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Bought (${bought.length})',
-                    style: textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  ...bought.map(_buildItem),
-                ],
-              ),
-      ),
+      body: SafeArea(child: content),
     );
   }
 }
