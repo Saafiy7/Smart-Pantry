@@ -9,7 +9,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => InventoryProvider()),
+        ChangeNotifierProvider(create: (context) => InventoryProvider()..charger()),
         ChangeNotifierProvider(create: (context) => ShoppingProvider()),
       ],
       child: const SmartPantryApp(),
