@@ -43,4 +43,31 @@ class Product {
       imageUrl: imageUrl ?? this.imageUrl,
     );
   }
+    Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'category': category,
+      'brand': brand,
+      'quantity': quantity,
+      'unit': unit,
+      'storageLocation': storageLocation,
+      'expirationDate': expirationDate.toIso8601String(),
+      'imageUrl': imageUrl,
+    };
+  }
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      category: json['category'] as String,
+      brand: json['brand'] as String,
+      quantity: (json['quantity'] as num).toDouble(),
+      unit: json['unit'] as String,
+      storageLocation: json['storageLocation'] as String,
+      expirationDate: DateTime.parse(json['expirationDate'] as String),
+      imageUrl: json['imageUrl'] as String?,
+    );
+  }
 }
