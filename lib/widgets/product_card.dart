@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smart_pantry/models/product.dart';
 import 'package:smart_pantry/core/theme/app_colors.dart';
+import 'package:smart_pantry/models/product.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -8,29 +8,9 @@ class ProductCard extends StatelessWidget {
 
   const ProductCard({super.key, required this.product, required this.onTap});
 
-  int get _daysLeft {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    return product.expirationDate.difference(today).inDays;
-  }
-
-  String get _expiryText {
-    if (_daysLeft < 0) return 'Expired';
-    if (_daysLeft == 0) return 'Expires today';
-    if (_daysLeft == 1) return 'Expires tomorrow';
-    return 'Expires in $_daysLeft days';
-  }
-
-  String get _statusLabel {
-    if (_daysLeft < 0) return 'Expired';
-    if (_daysLeft <= 3) return 'Expiring soon';
-    if (_daysLeft <= 7) return 'Use soon';
-    return 'Fresh';
-  }
-
   Color get _statusColor {
-    if (_daysLeft < 0) return AppColors.dangerRed;
-    if (_daysLeft <= 7) return AppColors.warningOrange;
+    if (product.isExpired) return AppColors.dangerRed;
+    if (product.isUseSoon) return AppColors.warningOrange;
     return AppColors.primaryGreen;
   }
 
@@ -72,7 +52,7 @@ class ProductCard extends StatelessWidget {
                       '${product.category} · $qty ${product.unit}',
                       style: textTheme.bodySmall,
                     ),
-                    Text(_expiryText, style: textTheme.bodySmall),
+                    Text(product.expiryText, style: textTheme.bodySmall),
                   ],
                 ),
               ),
@@ -83,7 +63,7 @@ class ProductCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  _statusLabel,
+                  product.statusLabel,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
