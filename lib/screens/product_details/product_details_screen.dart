@@ -20,19 +20,6 @@ class ProductDetailsScreen extends StatelessWidget {
     return '${d.day.toString().padLeft(2, '0')} ${_months[d.month - 1]} ${d.year}';
   }
 
-  int _daysLeft(Product p) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    return p.expirationDate.difference(today).inDays;
-  }
-
-  String _expiryText(Product p) {
-    final days = _daysLeft(p);
-    if (days < 0) return 'Expired';
-    if (days == 0) return 'Expires today';
-    return 'Expires in $days days';
-  }
-
   String _quantityNumber(Product p) {
     return p.quantity % 1 == 0
         ? p.quantity.toInt().toString()
@@ -166,7 +153,7 @@ class ProductDetailsScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(_formattedDate(live), style: textTheme.titleMedium),
                   const SizedBox(height: 4),
-                  Text(_expiryText(live), style: textTheme.bodySmall),
+                  Text(live.expiryText, style: textTheme.bodySmall),
                 ],
               ),
             ),

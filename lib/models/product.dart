@@ -70,4 +70,34 @@ class Product {
       imageUrl: json['imageUrl'] as String?,
     );
   }
+    int get daysLeft {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final expiration = DateTime(
+      expirationDate.year,
+      expirationDate.month,
+      expirationDate.day,
+    );
+    return expiration.difference(today).inDays;
+  }
+
+  bool get isExpired => daysLeft < 0;
+
+  bool get isExpiringSoon => daysLeft <= 3;
+
+  bool get isUseSoon => daysLeft <= 7;
+
+  String get statusLabel {
+    if (isExpired) return 'Expired';
+    if (isExpiringSoon) return 'Expiring soon';
+    if (isUseSoon) return 'Use soon';
+    return 'Fresh';
+  }
+
+  String get expiryText {
+    if (daysLeft < 0) return 'Expired';
+    if (daysLeft == 0) return 'Expires today';
+    if (daysLeft == 1) return 'Expires tomorrow';
+    return 'Expires in $daysLeft days';
+  }
 }

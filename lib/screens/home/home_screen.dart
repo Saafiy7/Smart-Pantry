@@ -19,17 +19,6 @@ class HomeScreen extends StatelessWidget {
     required this.onSeeAllProducts,
     required this.onOpenShoppingList,
   });
-
-  int _daysLeft(Product product) {
-    final today = DateTime.now();
-    final expirationDate = product.expirationDate;
-    return DateTime(
-      expirationDate.year,
-      expirationDate.month,
-      expirationDate.day,
-    ).difference(DateTime(today.year, today.month, today.day)).inDays;
-  }
-
   Widget _statCard(
     BuildContext context, {
     required IconData icon,
@@ -62,9 +51,8 @@ class HomeScreen extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final shoppingCount = context.watch<ShoppingProvider>().toBuyCount;
     final products = context.watch<InventoryProvider>().products;
-    final expiringProducts = products
-        .where((product) => _daysLeft(product) <= 3)
-        .toList();
+    final expiringProducts =
+        products.where((product) => product.isExpiringSoon).toList();
 
     return Scaffold(
       body: SafeArea(
